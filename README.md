@@ -36,7 +36,19 @@ All numbers below come from `outputs/part_b_metrics.csv`, `outputs/part_b_tree_d
 
 ## Model results (classification)
 
-_To be written after Part C._
+All numbers below come from `outputs/part_c_models.csv`, `outputs/part_c_feature_scores.csv`, `outputs/part_c_selectk.csv`, `outputs/part_c_tuning.csv`, `outputs/part_c_thresholds.csv` and `outputs/part_c_final_test.csv`. The stratified split gives 840 training, 180 validation and 180 test parcels, with 195, 42 and 41 delayed parcels respectively.
+
+1. **Blind baseline.** A model that predicts "not delayed" for every parcel scores an accuracy of 0.7667 on the validation rows (138 of 180 correct), which looks respectable. It is useless because it never raises an alert: its recall is 0 and all 42 delayed parcels are missed. The three real classifiers reach validation accuracies of 0.8833 to 0.9056, and their F1 scores are 0.8046 for logistic regression, 0.747 for the decision tree (depth 6) and 0.7848 for the default random forest.
+
+2. **Noise columns.** The five bookkeeping columns (`label_print_batch`, `scanner_build_no`, `tape_roll_no`, `sticker_serial_mod`, `shelf_slot_no`) carry no signal, yet together they take 0.2245 of the forest's importance across the 17 columns, because a forest still splits on them to fit random patterns. The F-score separates them cleanly: all five rank 8th or lower (ranks 8, 12, 14, 16 and 17) with F-scores between 0.023 and 4.5847, while the seven real columns (`distance_km`, `hub_tier`, `hub_daily_capacity`, `n_stops`, `promised_hours`, `rain_flag` and `sale_event_flag`) hold ranks 1 to 7 with F-scores from 36.7281 to 389.2131. So all five noise columns fall outside the top 7.
+
+3. **Feature selection.** The validation F1 for the forest with k selected features is 0.6988 at k=5, 0.8333 at k=7, 0.7857 at k=10, 0.8049 at k=12 and 0.7848 at k=17. It peaks at k=7, the number of columns that actually carry signal. At k=5 the model loses `rain_flag` and `sale_event_flag` and the score drops sharply, and beyond k=7 each extra column is mostly noise, so the score falls back. I used k=7 from then on.
+
+4. **Tuning.** Tuning did not beat the untuned forest. The grid search (27 candidates, 135 fits) reached a cross-validated accuracy of 0.8952 and a validation F1 of 0.775, and the randomized search (9 candidates, 45 fits) reached 0.8905 and 0.7848, while the untuned forest on the same seven columns scored a validation F1 of 0.8333. The cross-validated accuracies of the two searches differ by only 0.0047, so they are effectively tied. The validation set has only 42 delayed parcels, so one parcel changes recall by about 0.024 and F1 differences of 0.05 amount to a few parcels. A validation set that small cannot reliably separate configurations this close, and picking the winner from it partly rewards luck. I kept the untuned forest because it had the highest validation F1 of the three candidates, but I treat that choice as weakly supported.
+
+5. **Alert threshold.** The operations rule is the highest threshold whose validation recall is at least 0.80, which gives **0.5**. At 0.5 the model catches 35 of the 42 delayed parcels (recall 0.8333) with a precision of 0.7955. Raising the threshold to 0.6 lifts precision to 0.8889 but recall falls to 0.7619, below the rule. Lowering it buys more recall at a cost in false alarms: at 0.4 recall is 0.881 but precision is 0.74, and at 0.1 recall is 0.9762 while precision drops to 0.4824.
+
+6. **Test result.** At the threshold of 0.5, scored once on the test rows, the model has a precision of 0.6889, a recall of 0.7561 and an F1 of 0.7209: it caught 31 of the 41 delayed parcels and raised 14 false alarms. Test recall is lower than the 0.8333 seen on validation and below the 0.80 target. The threshold was chosen on the validation rows, so its validation recall is optimistic, and with only 41 delayed parcels a gap of about three parcels moves recall by this much. I would expect a recall of roughly 0.75 on new parcels rather than 0.83, and I would not claim the 0.80 target is met.
 
 ## Operations recommendation
 
