@@ -22,7 +22,17 @@ All numbers below are copied from `outputs/part_a_delay_by_group.csv`, `outputs/
 
 ## Model results (regression)
 
-_To be written after Part B._
+All numbers below come from `outputs/part_b_metrics.csv`, `outputs/part_b_tree_depth.csv`, `outputs/part_b_gb_learning_rate.csv` and `outputs/part_b_cv.csv`.
+
+1. **Baseline.** Predicting the training mean for every parcel gives a validation R² of −0.0212 (RMSE 18.8552 hours). It explains none of the variation in delivery time, so every real model has to beat this floor.
+
+2. **Validation winner.** Linear regression had the lowest validation RMSE, 4.8912 hours (R² 0.9313). Gradient boosting was close behind at 4.9165, then random forest at 5.468 and the decision tree at 6.2796. On the test rows, scored once, the linear model reached an RMSE of 4.5235 hours and an R² of 0.9493.
+
+3. **Bias and variance.** Shallow trees are high-bias: at depth 1 both errors are high (train 11.6334, val 12.1324) and almost equal, a gap of only 0.4990, so the tree is too simple to capture the pattern. Deep trees are high-variance: with no depth limit the training error falls to 0.0 but the validation error is 7.789, a gap of 7.789, and at depth 12 the gap is 6.056 (train 1.3613, val 7.4173). Depth 6 gave the lowest validation error (train 4.7114, val 6.2796), so it balances the two.
+
+4. **Learning rate.** A learning rate of 0.1 was best (validation R² 0.9306, RMSE 4.9165). At 0.01 each tree corrects too little, so 100 trees are not enough and the model under-fits (R² 0.7127). At 1.0 each tree overshoots the correction and the fit becomes unstable (R² 0.8440).
+
+5. **Which model to ship.** The two rankings disagree: linear regression wins on validation, but gradient boosting has the higher cross-validated R² (0.9352 against 0.9261). I would ship gradient boosting. The validation edge of linear regression is tiny, only 0.0253 hours of RMSE (4.8912 against 4.9165) on a single split of 180 rows. The cross-validated edge of gradient boosting is 0.0091 R², about two fold standard deviations (0.0044 to 0.0048), and it is averaged over five folds of the 1,020 training and validation rows, so it is the more reliable estimate. The two models have similar fold stability, so the simplicity of linear regression is its main advantage. The one weakness of this choice is that the single test score in `part_b_metrics.csv` belongs to linear regression, because the rule selects the lowest validation RMSE. Gradient boosting has no test estimate yet, so I would check its error on the first batch of new parcels before relying on it.
 
 ## Model results (classification)
 
