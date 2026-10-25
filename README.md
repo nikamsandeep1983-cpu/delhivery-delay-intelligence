@@ -1,5 +1,3 @@
-# delhivery-delay-intelligence
-delhivery-delay-intelligence
 # Delhivery Last-Mile Delay Intelligence Pipeline
 
 Capstone project, Artificial Intelligence and Machine Learning Certification Program (E&ICT Academy, IIT Roorkee). All data is synthetic and produced by `generate_data.py`.
