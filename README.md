@@ -4,8 +4,7 @@ Capstone project, Artificial Intelligence and Machine Learning Certification Pro
 
 ## How to run
 
-Run these commands in order from a fresh clone. They were written for Python 3.12 or newer on Windows PowerShell; on macOS or Linux, activate the environment with `source .venv/bin/activate` instead.Ran Python 3.15.1. Commit and push the change.
-
+Run these commands in order from a fresh clone. They were written for Python 3.12 or newer on Windows PowerShell; on macOS or Linux, activate the environment with source .venv/bin/activate instead. Tested with Python 3.15.1.
 ```
 git clone https://github.com/nikamsandeep1983-cpu/delhivery-delay-intelligence.git
 cd delhivery-delay-intelligence
